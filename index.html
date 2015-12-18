@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Hdidx by wanji</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Hdidx</h1>
+      <h2 class="project-tagline">The main repository has been moved to https://github.com/hdidx/hdidx.</h2>
+      <a href="https://github.com/wanji/hdidx" class="btn">View on GitHub</a>
+      <a href="https://github.com/wanji/hdidx/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/wanji/hdidx/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h1>
+<a id="hdidx-indexing-high-dimensional-data" class="anchor" href="#hdidx-indexing-high-dimensional-data" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>HDIdx</strong>: Indexing High-Dimensional Data</h1>
+
+<p><a href="https://pypi.python.org/pypi/hdidx/"><img src="https://img.shields.io/pypi/v/hdidx.svg?style=flat-square" alt="pypi"></a>
+<a href="https://pypi.python.org/pypi/hdidx/"><img src="https://img.shields.io/pypi/dm/hdidx.svg?style=flat-square" alt="downloads_month"></a>
+<a href="https://raw.githubusercontent.com/wanji/hdidx/master/LICENSE.md"><img src="https://img.shields.io/pypi/l/hdidx.svg?style=flat-square" alt="license"></a></p>
+
+<h2>
+<a id="what-is-hdidx" class="anchor" href="#what-is-hdidx" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is <strong>HDIdx</strong>?</h2>
+
+<p><strong>HDIdx</strong> is a python package for approximate nearest neighbor (ANN) search. Nearest neighbor (NN) search is very challenging in high-dimensional space because of the <a href="https://en.wikipedia.org/wiki/Curse_of_dimensionality"><em>Curse of Dimensionality</em></a> problem. The basic idea of <strong>HDIdx</strong> is to compress the original feature vectors into compact binary codes, and perform approximate NN search instead of extract NN search. This can largely reduce the storage requirements and can significantly speed up the search.</p>
+
+<h2>
+<a id="architecture" class="anchor" href="#architecture" aria-hidden="true"><span class="octicon octicon-link"></span></a>Architecture</h2>
+
+<p><img src="https://raw.githubusercontent.com/wanji/hdidx/master/doc/framework.png" alt="Framework"></p>
+
+<p><strong>HDIdx</strong> has three main modules: 1) <code>Encoder</code> which can compress the original feature vectors into compact binary hash codes, 2) <code>Indexer</code> which can index the database items and search approximate nearest neighbor for a given query item, and 3) <code>Storage</code> module which encapsulates the underlying data storage, which can be memory or NoSQL database like LMDB, for the <code>Indexer</code>.</p>
+
+<p>The current version implements following feature compressing algorithms: </p>
+
+<ul>
+<li>
+<code>Product Quantization</code>[1].</li>
+<li>
+<code>Spectral Hashing</code>[2].</li>
+</ul>
+
+<p>To use HDIdx, first you should learn a <code>Encoder</code> from some learning vectors.
+Then you can map the base vectors into hash codes using the learned <code>Encoder</code> and building indexes over these hash codes by an <code>Indexer</code>, which will write the indexes to the specified storage medium.
+When a query vector comes, it will be mapped to hash codes by the same <code>Encoder</code> and the <code>Indexer</code> will find the similar items to this query vector.</p>
+
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p><strong>HDIdx</strong> can be installed by <code>pip</code>:</p>
+
+<div class="highlight highlight-source-shell"><pre>[sudo] pip install hdidx</pre></div>
+
+<p>By default, <strong>HDIdx</strong> use kmeans algorithm provided by <a href="http://www.scipy.org/"><em>SciPy</em></a>. To be more efficient, you can install python extensions of <a href="http://opencv.org/"><em>OpenCV</em></a>, which can be installed via <code>apt-get</code> on Ubuntu. For other Linux distributions, e.g. CentOS, you need to compile it from source.</p>
+
+<div class="highlight highlight-source-shell"><pre>[sudo] apt-get install python-opencv</pre></div>
+
+<p><strong>HDIdx</strong> will use <a href="http://opencv.org/"><em>OpenCV</em></a> automatically if it is available.</p>
+
+<h3>
+<a id="windows-guide" class="anchor" href="#windows-guide" aria-hidden="true"><span class="octicon octicon-link"></span></a>Windows Guide</h3>
+
+<p>General dependencies:</p>
+
+<ul>
+<li><a href="https://store.continuum.io/cshop/anaconda/">Anaconda</a></li>
+<li><a href="http://www.microsoft.com/en-us/download/details.aspx?id=44266">Microsoft Visual C++ Compiler for Python</a></li>
+</ul>
+
+<p>After install the above mentioned software, download <a href="http://msinttypes.googlecode.com/svn/trunk/stdint.h"><code>stdint.h</code></a> and put it under the <code>include</code> folder of Visual C++, e.g. <code>C:\Users\xxx\AppData\Local\Programs\Common\Microsoft\Visual C++ for Python\9.0\VC\include</code>. Then hdidx can be installed by <code>pip</code> from the <em>Anaconda Command Prompt</em>.</p>
+
+<h2>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example</h2>
+
+<p>Here is a simple example. See this <a href="http://nbviewer.ipython.org/gist/wanji/c08693f06ef744feef50">notebook</a> for more examples.</p>
+
+<div class="highlight highlight-source-python"><pre><span class="pl-c"># import necessary packages</span>
+
+<span class="pl-k">import</span> hdidx
+<span class="pl-k">import</span> numpy <span class="pl-k">as</span> np
+
+<span class="pl-c"># generating sample data</span>
+ndim <span class="pl-k">=</span> <span class="pl-c1">16</span>      <span class="pl-c"># dimension of features</span>
+ndb <span class="pl-k">=</span> <span class="pl-c1">10000</span>    <span class="pl-c"># number of dababase items</span>
+nqry <span class="pl-k">=</span> <span class="pl-c1">10</span>      <span class="pl-c"># number of queries</span>
+
+X_db <span class="pl-k">=</span> np.random.random((ndb, ndim))
+X_qry <span class="pl-k">=</span> np.random.random((nqry, ndim))
+
+<span class="pl-c"># create Product Quantization Indexer</span>
+idx <span class="pl-k">=</span> hdidx.indexer.IVFPQIndexer()
+<span class="pl-c"># build indexer</span>
+idx.build({<span class="pl-s"><span class="pl-pds">'</span>vals<span class="pl-pds">'</span></span>: X_db, <span class="pl-s"><span class="pl-pds">'</span>nsubq<span class="pl-pds">'</span></span>: <span class="pl-c1">8</span>})
+<span class="pl-c"># add database items to the indexer</span>
+idx.add(X_db)
+<span class="pl-c"># searching in the database, and return top-10 items for each query</span>
+ids, dis <span class="pl-k">=</span> idx.search(X_qry, <span class="pl-c1">10</span>)
+<span class="pl-k">print</span> ids
+<span class="pl-k">print</span> dis</pre></div>
+
+<h2>
+<a id="citation" class="anchor" href="#citation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Citation</h2>
+
+<p>Please cite the following paper if you use this library:</p>
+
+<pre><code>@article{wan2015hdidx,
+  title={HDIdx: High-Dimensional Indexing for Efficient Approximate Nearest Neighbor Search},
+  author={Wan, Ji and Tang, Sheng and Zhang, Yongdong and Li, Jintao and Wu, Pengcheng and Hoi, Steven CH},
+  journal={arXiv preprint arXiv:1510.01991},
+  year={2015}
+}
+</code></pre>
+
+<h2>
+<a id="reference" class="anchor" href="#reference" aria-hidden="true"><span class="octicon octicon-link"></span></a>Reference</h2>
+
+<pre><code>[1] Jegou, Herve, Matthijs Douze, and Cordelia Schmid.
+    "Product quantization for nearest neighbor search."
+    Pattern Analysis and Machine Intelligence, IEEE Transactions on 33.1 (2011): 117-128.
+[2] Weiss, Yair, Antonio Torralba, and Rob Fergus.
+    "Spectral hashing."
+    In Advances in neural information processing systems, pp. 1753-1760. 2009.
+</code></pre>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/wanji/hdidx">Hdidx</a> is maintained by <a href="https://github.com/wanji">wanji</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
